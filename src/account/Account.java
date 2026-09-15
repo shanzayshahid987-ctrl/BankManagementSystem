@@ -1,3 +1,4 @@
+package account;
 import exceptions.*;
 import transactionpin.*;
 import java.util.Random;
@@ -9,9 +10,10 @@ public class Account {
     private BigDecimal currentBalance;
     private TransactionPIN pin;
 
+
     public Account(String PIN, BigDecimal balance) throws InvalidPinException {
         this.accountNumber = generateAccountNumber();
-        this.status = ACTIVE;
+        this.status = AccountStatus.ACTIVE;
         this.currentBalance = balance;
         this.pin = new TransactionPIN(PIN);
     }
@@ -35,15 +37,15 @@ public class Account {
     }
 
     public void statusFrozen() {
-        this.status = FROZEN;
+        this.status = AccountStatus.FROZEN;
     }
 
     public void statusClosed() {
-        this.status = CLOSED;
+        this.status = AccountStatus.CLOSED;
     }
 
     public void statusActive() {
-        this.status = ACTIVE;
+        this.status = AccountStatus.ACTIVE;
     }
 
     public void setTransactionPIN(String PIN) throws InvalidPinException {
@@ -55,7 +57,7 @@ public class Account {
         if (this.status != AccountStatus.ACTIVE) {
             throw new AccountNotActiveException(this.accountNumber + "is not currently active.");
         }
-        if (amount.compareTo(BigDecimal.ZER0) <= 0) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidAmountException("Invalid Amount.");
         }
         this.currentBalance = this.currentBalance.add(amount);
@@ -66,7 +68,7 @@ public class Account {
         if (this.status != AccountStatus.ACTIVE) {
             throw new AccountNotActiveException(this.accountNumber + "is not currently active.");
         }
-        if (amount.compareTo(BigDecimal.ZER0) <= 0) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidAmountException("Invalid Amount.");
         }
         if (amount.compareTo(this.currentBalance) > 0) {

@@ -1,7 +1,5 @@
-import exceptions.*;
+package password;
 import java.security.*;
-import java.util.regex.*;
-
 import exceptions.InvalidPasswordFormatException;
 
 public class PasswordUtil {

@@ -1,5 +1,9 @@
 import java.util.Scanner;
 import java.math.BigDecimal;
+import account.*;
+import exceptions.AccountNotActiveException;
+import exceptions.InvalidAmountException;
+import exceptions.InvalidPinException;
 
 public class BankManagementSystem{
 
@@ -7,9 +11,25 @@ public class BankManagementSystem{
         Scanner scan = new Scanner(System.in);
         String pin = scan.nextLine();
         BigDecimal balance = scan.nextBigDecimal();
+         Account acc1;
 
-        Account acc1 = new Account(pin, balance);
-        acc1.deposit(-500);
-        acc1.withdraw(500);
+       try{
+        acc1 = new Account(pin, balance);
+        System.out.println("Account created sucessfully");
+       } catch(InvalidPinException e){
+        System.out.println("Account creation failed: " + e.getMessage());
+        return;      
+    }
+
+
+       try{
+        acc1.deposit(new BigDecimal(-500));
+         System.out.println("Amount deposited sucessfully");
+
+       }catch(InvalidAmountException| AccountNotActiveException e){
+         System.out.println("Deposit failed: " + e.getMessage());
+
+       }
+        
     }
 }
