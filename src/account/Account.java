@@ -1,18 +1,25 @@
 package account;
 import exceptions.*;
-import transactionpin.*;
+import security.*;
 import java.util.Random;
+import java.util.ArrayList;
 import java.math.BigDecimal;
+import transaction.Transaction;
+import transaction.TransactionType;
+import customer.*;
 
-public class Account {
+public abstract class Account {
     private String accountNumber;
     private AccountStatus status;
     private BigDecimal currentBalance;
     private TransactionPIN pin;
+     ArrayList<Transaction> transactionHistory;
+     Customer custom;
 
-
-    public Account(String PIN, BigDecimal balance) throws InvalidPinException {
-        this.accountNumber = generateAccountNumber();
+    public Account(Customer customer,String PIN, BigDecimal balance) throws InvalidPinException {
+        this.custom = customer;
+        this.transactionHistory = new ArrayList<>();
+        this.accountNumber = generateUniqueAccountNumber(custom.getAccounts());
         this.status = AccountStatus.ACTIVE;
         this.currentBalance = balance;
         this.pin = new TransactionPIN(PIN);
@@ -22,6 +29,23 @@ public class Account {
         Random rand = new Random();
         long number = 1000000000L + (long) (rand.nextDouble() * 9000000000L);
         return "ACC" + number;
+    }
+
+    public String generateUniqueAccountNumber(ArrayList<Account> acc){
+        String accNum;
+        boolean exist;
+        do{
+            accNum = generateAccountNumber();
+            exist=false;
+            for(Account a : acc){
+                if(a.getAccountNumber().equals(accNum)){
+                    exist=true;
+                    break;
+                }
+            }
+
+        }while(exist);
+        return accNum;
     }
 
     public String getAccountNumber() {
@@ -61,6 +85,8 @@ public class Account {
             throw new InvalidAmountException("Invalid Amount.");
         }
         this.currentBalance = this.currentBalance.add(amount);
+        Transaction t = new Transaction(TransactionType.DEPOSIT, this , amount, currentBalance, this.transactionHistory);
+        transactionHistory.add(t);
     }
 
     public void withdraw(BigDecimal amount)throws AccountNotActiveException,
@@ -75,7 +101,8 @@ public class Account {
             throw new InsufficientBalanceException("Insufficient balance.");
         }
         this.currentBalance = this.currentBalance.subtract(amount);
-
+        Transaction t = new Transaction(TransactionType.WITHDRAW, this , amount, currentBalance, this.transactionHistory);
+        transactionHistory.add(t);
+    }
     }
 
-}
