@@ -1,4 +1,4 @@
-package password;
+package security;
 import java.security.*;
 import exceptions.InvalidPasswordFormatException;
 
@@ -35,6 +35,10 @@ public class PasswordUtil {
     public boolean toVerify(String rawPassword) {
         String hashed = hash(rawPassword);
         return hashed.equals(this.hashedPass);
+    }
+
+    public String toString(){
+        return this.hashedPass;
     }
 
 }

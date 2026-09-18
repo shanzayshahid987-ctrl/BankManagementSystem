@@ -14,12 +14,11 @@ public abstract class Account {
     private BigDecimal currentBalance;
     private TransactionPIN pin;
      ArrayList<Transaction> transactionHistory;
-     Customer custom;
+     ArrayList<Customer> customers;
 
-    public Account(Customer customer,String PIN, BigDecimal balance) throws InvalidPinException {
-        this.custom = customer;
+    public Account(ArrayList<Customer> customers ,String PIN, BigDecimal balance) throws InvalidPinException {
         this.transactionHistory = new ArrayList<>();
-        this.accountNumber = generateUniqueAccountNumber(custom.getAccounts());
+        this.accountNumber = generateUniqueAccountNumber();
         this.status = AccountStatus.ACTIVE;
         this.currentBalance = balance;
         this.pin = new TransactionPIN(PIN);
@@ -31,13 +30,13 @@ public abstract class Account {
         return "ACC" + number;
     }
 
-    public String generateUniqueAccountNumber(ArrayList<Account> acc){
+    public String generateUniqueAccountNumber(){
         String accNum;
         boolean exist;
         do{
             accNum = generateAccountNumber();
             exist=false;
-            for(Account a : acc){
+            for(Account a : this.allAccounts(this.customers)){
                 if(a.getAccountNumber().equals(accNum)){
                     exist=true;
                     break;
@@ -104,5 +103,15 @@ public abstract class Account {
         Transaction t = new Transaction(TransactionType.WITHDRAW, this , amount, currentBalance, this.transactionHistory);
         transactionHistory.add(t);
     }
+
+
+    public ArrayList<Account> allAccounts(ArrayList<Customer> customers){
+        ArrayList<Account> accounts = new ArrayList<>();
+        for(Customer c: customers){
+            accounts.addAll(c.getAccounts());
+
+        }
+        return accounts;
     }
+}
 

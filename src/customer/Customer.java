@@ -21,7 +21,7 @@ public class Customer {
     public Customer(String name, String dob, String password,String email,String cnic,
          String number, String address, String username)throws InvalidNameException, InvalidDateException,
           InvalidPasswordFormatException, InvalidEmailException,
-         InvalidAgeException,InvalidCNICException,InvalidContactNumberException{
+         InvalidAgeException, InvalidCNICException, InvalidContactNumberException{
         this.accounts = new ArrayList<>();
         this.username=username;
         if(!(this.isValidFullName(name))){
