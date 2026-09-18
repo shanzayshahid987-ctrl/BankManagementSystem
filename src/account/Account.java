@@ -93,7 +93,8 @@ public abstract class Account {
     }
 
     public void withdraw(BigDecimal amount)throws AccountNotActiveException,
-            InvalidAmountException, InsufficientBalanceException, TransactionLimitExceededException {
+            InvalidAmountException, InsufficientBalanceException, 
+            TransactionLimitExceededException, MinimumBalanceException {
         if (this.status != AccountStatus.ACTIVE) {
             throw new AccountNotActiveException(this.accountNumber + "is not currently active.");
         }
