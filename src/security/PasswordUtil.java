@@ -1,4 +1,5 @@
 package security;
+
 import java.security.*;
 import exceptions.InvalidPasswordFormatException;
 
@@ -37,7 +38,7 @@ public class PasswordUtil {
         return hashed.equals(this.hashedPass);
     }
 
-    public String toString(){
+    public String toString() {
         return this.hashedPass;
     }
 

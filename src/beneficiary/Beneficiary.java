@@ -1,13 +1,27 @@
 package beneficiary;
-import account.*;
+
+
 public class Beneficiary {
     private String beneficiaryName;
     private String nickname;
-    private Account account;
+    private String accountNumber;
 
-    public Beneficiary(String name, String nickname, Account account){
-        
+    public Beneficiary(String name, String nickname, String account) {
+         this.beneficiaryName = name;
+         this.nickname = nickname;
+         this.accountNumber = account;
+    }
 
+    public String getBeneficiaryName(){
+        return this.beneficiaryName;
+    }
+
+     public String getNickname(){
+        return this.nickname;
+    }
+
+     public String getAccountNumber(){
+        return this.accountNumber;
     }
 
 

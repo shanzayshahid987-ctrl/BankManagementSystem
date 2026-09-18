@@ -1,4 +1,5 @@
 package security;
+
 import exceptions.*;
 import java.security.*;
 
@@ -36,4 +37,3 @@ public class TransactionPIN {
         return hashed.equals(this.hashedPIN);
     }
 }
-
