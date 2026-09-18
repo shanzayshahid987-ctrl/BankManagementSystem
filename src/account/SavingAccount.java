@@ -1,0 +1,64 @@
+package account;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+
+import exceptions.*;
+import security.TransactionPIN;
+import transaction.*;
+import customer.*;
+import java.time.LocalDate;
+
+import customer.Customer;
+
+public class SavingAccount extends Account {
+
+    private final BigDecimal yearlyInterestRate = BigDecimal.valueOf(0.05);
+    private final BigDecimal monthlyInterestRate = yearlyInterestRate.divide(BigDecimal.valueOf(12));
+    private int transactionLimitCounter=0;
+    private int currentMonth=LocalDate.now().getMonthValue();
+
+    public SavingAccount(ArrayList<Customer> customers ,String PIN, BigDecimal balance) 
+    throws InvalidPinException{
+        super(customers, PIN, balance);
+    }
+
+      @Override 
+    public void yearlyInterestRate(){
+        BigDecimal currentBalance = super.getCurrentBalance();
+        BigDecimal interestAmount = currentBalance.multiply((this.yearlyInterestRate));
+        super.setCurrentBalance(currentBalance.add(interestAmount));
+        Transaction t = new Transaction(TransactionType.INTEREST, this, 
+            interestAmount, super.getCurrentBalance(), transactionHistory);
+        transactionHistory.add(t);
+    }
+
+    @Override 
+    public void monthlyInterestRate(){
+        BigDecimal currentBalance = super.getCurrentBalance();
+        BigDecimal interestAmount = currentBalance.multiply((this.monthlyInterestRate));
+        super.setCurrentBalance(currentBalance.add(interestAmount));
+         Transaction t = new Transaction(TransactionType.INTEREST, this, 
+        interestAmount, super.getCurrentBalance(), transactionHistory);
+        transactionHistory.add(t);
+    }
+
+    @Override 
+     public void withdraw(BigDecimal amount)throws AccountNotActiveException,
+    InvalidAmountException, InsufficientBalanceException, TransactionLimitExceededException {
+                resetIfNextMonth();
+                if(this.transactionLimitCounter>=3){
+                    throw new TransactionLimitExceededException("Max Transaction Limit is 3");
+                }
+                super.withdraw(amount);
+                this.transactionLimitCounter++;
+            }
+
+    public void resetIfNextMonth(){
+        int nowMonth = LocalDate.now().getMonthValue();
+       if(nowMonth!=currentMonth){
+        this.transactionLimitCounter=0;
+        this.currentMonth=nowMonth;
+       }
+    }
+    
+}

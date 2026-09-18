@@ -75,6 +75,10 @@ public abstract class Account {
         this.pin = new TransactionPIN(PIN);
     }
 
+    public void setCurrentBalance(BigDecimal amount){
+        this.currentBalance = amount;
+    }
+
     public void deposit(BigDecimal amount) throws AccountNotActiveException,
             InvalidAmountException {
         if (this.status != AccountStatus.ACTIVE) {
@@ -89,7 +93,7 @@ public abstract class Account {
     }
 
     public void withdraw(BigDecimal amount)throws AccountNotActiveException,
-            InvalidAmountException, InsufficientBalanceException {
+            InvalidAmountException, InsufficientBalanceException, TransactionLimitExceededException {
         if (this.status != AccountStatus.ACTIVE) {
             throw new AccountNotActiveException(this.accountNumber + "is not currently active.");
         }
@@ -113,5 +117,9 @@ public abstract class Account {
         }
         return accounts;
     }
+
+    public abstract void monthlyInterestRate();
+     public abstract void yearlyInterestRate();
+
 }
 
