@@ -1,4 +1,5 @@
 package account;
+
 import exceptions.*;
 import security.*;
 import java.util.Random;
@@ -13,10 +14,13 @@ public abstract class Account {
     private AccountStatus status;
     private BigDecimal currentBalance;
     private TransactionPIN pin;
-     ArrayList<Transaction> transactionHistory;
-     ArrayList<Customer> customers;
+    protected ArrayList<Transaction> transactionHistory;
+    private Customer customer;
+    private ArrayList<Customer> customers;
 
-    public Account(ArrayList<Customer> customers ,String PIN, BigDecimal balance) throws InvalidPinException {
+    public Account(Customer customer, ArrayList<Customer> customers, String PIN, BigDecimal balance)
+            throws InvalidPinException {
+        this.customer = customer;
         this.transactionHistory = new ArrayList<>();
         this.accountNumber = generateUniqueAccountNumber();
         this.status = AccountStatus.ACTIVE;
@@ -30,20 +34,20 @@ public abstract class Account {
         return "ACC" + number;
     }
 
-    public String generateUniqueAccountNumber(){
+    public String generateUniqueAccountNumber() {
         String accNum;
         boolean exist;
-        do{
+        do {
             accNum = generateAccountNumber();
-            exist=false;
-            for(Account a : this.allAccounts(this.customers)){
-                if(a.getAccountNumber().equals(accNum)){
-                    exist=true;
+            exist = false;
+            for (Account a : this.allAccounts(this.customers)) {
+                if (a.getAccountNumber().equals(accNum)) {
+                    exist = true;
                     break;
                 }
             }
 
-        }while(exist);
+        } while (exist);
         return accNum;
     }
 
@@ -57,6 +61,10 @@ public abstract class Account {
 
     public BigDecimal getCurrentBalance() {
         return this.currentBalance;
+    }
+
+    public Customer getCustomer() {
+        return this.customer;
     }
 
     public void statusFrozen() {
@@ -75,7 +83,7 @@ public abstract class Account {
         this.pin = new TransactionPIN(PIN);
     }
 
-    public void setCurrentBalance(BigDecimal amount){
+    public void setCurrentBalance(BigDecimal amount) {
         this.currentBalance = amount;
     }
 
@@ -88,12 +96,12 @@ public abstract class Account {
             throw new InvalidAmountException("Invalid Amount.");
         }
         this.currentBalance = this.currentBalance.add(amount);
-        Transaction t = new Transaction(TransactionType.DEPOSIT, this , amount, currentBalance, this.transactionHistory);
+        Transaction t = new Transaction(TransactionType.DEPOSIT, this, amount, currentBalance, this.transactionHistory);
         transactionHistory.add(t);
     }
 
-    public void withdraw(BigDecimal amount)throws AccountNotActiveException,
-            InvalidAmountException, InsufficientBalanceException, 
+    public void withdraw(BigDecimal amount) throws AccountNotActiveException,
+            InvalidAmountException, InsufficientBalanceException,
             TransactionLimitExceededException, MinimumBalanceException {
         if (this.status != AccountStatus.ACTIVE) {
             throw new AccountNotActiveException(this.accountNumber + "is not currently active.");
@@ -105,22 +113,18 @@ public abstract class Account {
             throw new InsufficientBalanceException("Insufficient balance.");
         }
         this.currentBalance = this.currentBalance.subtract(amount);
-        Transaction t = new Transaction(TransactionType.WITHDRAW, this , amount, currentBalance, this.transactionHistory);
+        Transaction t = new Transaction(TransactionType.WITHDRAW, this, amount, currentBalance,
+                this.transactionHistory);
         transactionHistory.add(t);
     }
 
-
-    public ArrayList<Account> allAccounts(ArrayList<Customer> customers){
+    public ArrayList<Account> allAccounts(ArrayList<Customer> customers) {
         ArrayList<Account> accounts = new ArrayList<>();
-        for(Customer c: customers){
+        for (Customer c : customers) {
             accounts.addAll(c.getAccounts());
 
         }
         return accounts;
     }
 
-    public abstract void monthlyInterestRate();
-     public abstract void yearlyInterestRate();
-
 }
-
