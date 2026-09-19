@@ -99,7 +99,6 @@ public class Transaction {
             receipt.append("Receiver Name: ").append(this.targetAccount.getCustomer().getFullName()).append("\n");
             receipt.append("Receiver Account: ").append(this.targetAccount.getAccountNumber()).append("\n");
         } else {
-            // DEPOSIT or WITHDRAW
             receipt.append("Account Holder: ").append(this.account.getCustomer().getFullName()).append("\n");
             receipt.append("Account Number: ").append(this.account.getAccountNumber()).append("\n");
             receipt.append("Balance After: ").append(this.balanceAfter).append("\n");

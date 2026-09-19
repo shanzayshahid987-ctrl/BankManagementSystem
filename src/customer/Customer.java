@@ -58,6 +58,10 @@ public class Customer {
 
     }
 
+    public String getEmail(){
+        return this.email;
+    }
+
     public String getUsername() {
         return this.username;
 
