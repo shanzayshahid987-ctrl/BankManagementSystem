@@ -21,6 +21,7 @@ public abstract class Account {
     public Account(Customer customer, ArrayList<Customer> customers, String PIN, BigDecimal balance)
             throws InvalidPinException {
         this.customer = customer;
+        this.customers = customers;
         this.transactionHistory = new ArrayList<>();
         this.accountNumber = generateUniqueAccountNumber();
         this.status = AccountStatus.ACTIVE;
@@ -65,6 +66,10 @@ public abstract class Account {
 
     public Customer getCustomer() {
         return this.customer;
+    }
+
+    public ArrayList<Transaction> getTransactionHistory(){
+        return this.transactionHistory;
     }
 
     public void statusFrozen() {

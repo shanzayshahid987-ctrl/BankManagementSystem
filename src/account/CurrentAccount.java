@@ -39,6 +39,7 @@ public class CurrentAccount extends Account {
 
         Transaction t = new Transaction(TransactionType.TRANSFER, this, amount ,
          super.getCurrentBalance(), transactionHistory);
+         t.setTargetAccount(targetAccount);
         transactionHistory.add(t);
     }
 }

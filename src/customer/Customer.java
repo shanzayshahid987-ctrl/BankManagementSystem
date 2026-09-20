@@ -7,6 +7,7 @@ import exceptions.*;
 import java.time.LocalDate;
 import java.time.Period;
 import beneficiary.*;
+import java.time.format.DateTimeParseException;
 
 public class Customer {
     private ArrayList<Account> accounts;
@@ -106,13 +107,13 @@ public class Customer {
         if (dob == null) {
             return false;
         }
+        try {
         LocalDate birthDate = LocalDate.parse(dob);
         LocalDate currentDate = LocalDate.now();
-
-        if (birthDate.isAfter(currentDate)) {
-            return false;
-        }
-        return true;
+        return !birthDate.isAfter(currentDate);
+    } catch (DateTimeParseException e) {
+        return false;
+    }
     }
 
     public boolean isValidEmail(String email) {

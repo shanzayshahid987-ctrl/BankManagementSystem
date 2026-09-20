@@ -77,7 +77,7 @@ public class Admin {
         }
     }
 
-    public void reActiveAccount(String accNum, ArrayList<Customer> allCustomer)
+    public void reactiveAccount(String accNum, ArrayList<Customer> allCustomer)
             throws InvalidStatusChangeException {
 
         Account acc = findAccountByNum(accNum, allCustomer);
@@ -95,7 +95,7 @@ public class Admin {
         }
     }
 
-    public BigDecimal totalBalance(ArrayList<Customer> allCustomers){
+    public BigDecimal getTotalbANKBalance(ArrayList<Customer> allCustomers){
         BigDecimal sum = BigDecimal.ZERO;
         for(Customer c : allCustomers){
             for(Account a : c.getAccounts()){
