@@ -38,7 +38,12 @@ public class Customer {
             throw new InvalidDateException("Invalid date.");
         }
         this.dob = dob;
+        
+         try {
         this.password = new PasswordUtil(password);
+    } catch (InvalidPasswordFormatException e) {
+        throw new InvalidPasswordFormatException(e.getMessage());
+    }
         if (!(this.isValidEmail(email))) {
             throw new InvalidEmailException("Invalid Email entered.");
         }

@@ -6,17 +6,28 @@ import admin.Admin;
 import customer.Customer;
 import exceptions.*;
 import transaction.*;
+import department.*;
 
 public class BankManagementSystem {
 
     public static void main(String[] args){
      Scanner scan = new Scanner(System.in);
+
      ArrayList<Customer> registeredCustomers = new ArrayList<>();
+      Department department = null;
+    try {
+        department = new Department("masterPassword123"); 
+    } catch (InvalidPasswordFormatException e) {
+        System.out.println("Failed to initialize department: " + e.getMessage());
+        return; 
+    }
+
      System.out.println("-----VAULTEDGE-----");
      System.out.println("Welcome! Are you a:");
         System.out.println("1. Customer");
         System.out.println("2. Admin");
-        System.out.print("Enter choice: ");
+         System.out.println("3. Department (Register new Admin)");
+        System.out.print("Enter choice(1-3): ");
         int roleChoice = Integer.parseInt(scan.nextLine());
         if(roleChoice == 1){
            System.out.print("Login / Signup ");
@@ -57,7 +68,7 @@ public class BankManagementSystem {
                             System.out.println("No account found.");
                         }
                         if(activeAccount!=null){
-                            showAccountMenu(scan, activeAccount, registeredCustomers);
+                            showAccountMenu(scan, trackCustomer, activeAccount, registeredCustomers);
 
                              }
                         }
@@ -92,8 +103,71 @@ public class BankManagementSystem {
                 Customer newCustomer = new Customer(name, dob, password, email, cnic, contact, address, username);
                 System.out.println("Signup successful!");
                 registeredCustomers.add(newCustomer);
+                accountCreation(scan, newCustomer, registeredCustomers);
+            }catch(InvalidNameException| InvalidDateException| InvalidPasswordFormatException| 
+            InvalidEmailException|  InvalidAgeException|
+             InvalidCNICException| InvalidContactNumberException e ){
+                System.out.println("Signup Failed: " + e.getMessage());
+                
+            }
+        }
 
-                System.out.println("Choose account type: 1) Savings  2) Current");
+        } else if(roleChoice == 2){
+            boolean validAdmin = false;
+            Admin trackAdmin = null;
+              System.out.print("Enter admin username: ");
+              String adminUser = scan.nextLine();
+
+              System.out.print("Enter admin password: ");
+             String adminPass = scan.nextLine();
+
+             for(Admin i : department.getAllAdmins()){
+                if(i.getUsername().equals(adminUser)){
+                    if(i.login(adminPass)){
+                        validAdmin = true;
+                        trackAdmin= i;
+                        break;
+
+                    }
+                }
+             } if(!validAdmin){
+                System.out.println("Inavlid Admin credentials.");
+             }else{
+                  System.out.println("Admin login successful!");
+                showAdminMenu(scan, trackAdmin, registeredCustomers);
+             }
+
+
+        }else if(roleChoice==3){
+             System.out.print("Enter master password: ");
+             String masterPass = scan.nextLine();
+    
+    if(department.verifyMasterPassword(masterPass)){
+        System.out.print("Enter new admin username: ");
+        String newAdminUser = scan.nextLine();
+        System.out.print("Enter new admin password: ");
+        String newAdminPass = scan.nextLine();
+        
+        try {
+            department.registerAdmin(newAdminUser, newAdminPass);
+            System.out.println("Admin registered successfully!");
+        } catch (InvalidPasswordFormatException e) {
+            System.out.println("Registration failed: " + e.getMessage());
+        }
+    } else {
+        System.out.println("Incorrect master password.");
+    }
+        }else{
+            System.out.println("Invalid choice.");
+        }
+
+
+
+    }
+
+    public static void accountCreation(Scanner scan,
+     Customer newCustomer, ArrayList<Customer> registeredCustomers){
+        System.out.println("Choose account type: 1) Savings  2) Current");
                 int accType = Integer.parseInt(scan.nextLine());
     
                  System.out.print("Set a 4-digit transaction PIN: ");
@@ -111,49 +185,21 @@ public class BankManagementSystem {
                     }
                     newCustomer.addAccount(newAccount);
                      System.out.println("Account created! Your account number: " + newAccount.getAccountNumber());
-                     showAccountMenu(scan, newAccount, registeredCustomers);
+                    showAccountMenu(scan, newCustomer, newAccount, registeredCustomers);
                 }catch(InvalidPinException| MinimumBalanceException e){
                     System.out.println("Accout creation failed: " + e.getMessage());
 
                 }
 
-            }catch(InvalidNameException| InvalidDateException| InvalidPasswordFormatException| 
-            InvalidEmailException|  InvalidAgeException|
-             InvalidCNICException| InvalidContactNumberException e ){
-                System.out.println("Signup Failed: " + e.getMessage());
-                
-            }
-
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        } else if(roleChoice == 2){
-
-        }else{
-            System.out.println("Invalid choice.");
-        }
-
-
-
     }
 
-    public static void showAccountMenu(Scanner scan, Account activeAccount,
+    public static void showAccountMenu(Scanner scan,Customer customer, Account activeAccount,
         ArrayList<Customer> registeredCustomers){
                          boolean running = true;
                             while(running){
                                 System.out.print("\n1- Deposit" + "\n2- WithDraw"
-                                    + "\n3- Transfer" + "\n4- ViewBalance" + "\n5- Logout" );
+                                    + "\n3- Transfer" + "\n4- ViewBalance" + 
+                                    "\n5- Create new Account" + "\n6- Logout");
                                 int option = Integer.parseInt(scan.nextLine());
                                 switch(option){
                                     case 1: {
@@ -251,6 +297,10 @@ public class BankManagementSystem {
                                     }
 
                                     case 5: {
+                                      accountCreation(scan, customer, registeredCustomers);
+                                      break;
+                                    }
+                                    case 6: {
                                         System.out.println("Logged out.");
                                         running=false;
                                         break;

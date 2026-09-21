@@ -19,6 +19,10 @@ public class Admin {
 
     }
 
+    public String getUsername(){
+        return this.username;
+    }
+
     public boolean login(String password) {
         return this.password.toVerify(password);
     }
@@ -95,7 +99,7 @@ public class Admin {
         }
     }
 
-    public BigDecimal getTotalbANKBalance(ArrayList<Customer> allCustomers){
+    public BigDecimal getTotalBankBalance(ArrayList<Customer> allCustomers){
         BigDecimal sum = BigDecimal.ZERO;
         for(Customer c : allCustomers){
             for(Account a : c.getAccounts()){
@@ -106,7 +110,7 @@ public class Admin {
         return sum;
     }
 
-    public void printAllCustomer(ArrayList<Customer> allCustomers){
+    public void viewAllCustomers(ArrayList<Customer> allCustomers){
         for(Customer c : allCustomers){
             System.out.println("Customer: " + c.getFullName() +"| CNIC: " + c.getCNIC());
             for(Account a : c.getAccounts()){
