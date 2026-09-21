@@ -22,7 +22,7 @@ public class BankManagementSystem {
         return; 
     }
 
-     System.out.println("-----VAULTEDGE-----");
+     printLogo();
      System.out.println("Welcome! Are you a:");
         System.out.println("1. Customer");
         System.out.println("2. Admin");
@@ -164,6 +164,17 @@ public class BankManagementSystem {
 
 
     }
+
+    public static void printLogo() {
+    System.out.println("██╗   ██╗ █████╗ ██╗   ██╗██╗  ████████╗███████╗██████╗  ██████╗ ███████╗");
+    System.out.println("██║   ██║██╔══██╗██║   ██║██║  ╚══██╔══╝██╔════╝██╔══██╗██╔════╝ ██╔════╝");
+    System.out.println("██║   ██║███████║██║   ██║██║     ██║   █████╗  ██║  ██║██║  ███╗█████╗  ");
+    System.out.println("╚██╗ ██╔╝██╔══██║██║   ██║██║     ██║   ██╔══╝  ██║  ██║██║   ██║██╔══╝  ");
+    System.out.println(" ╚████╔╝ ██║  ██║╚██████╔╝███████╗██║   ███████╗██████╔╝╚██████╔╝███████╗");
+    System.out.println("  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚══════╝╚═════╝  ╚═════╝ ╚══════╝");
+    System.out.println("                     Your Trusted Banking Partner");
+    System.out.println();
+}
 
     public static void accountCreation(Scanner scan,
      Customer newCustomer, ArrayList<Customer> registeredCustomers){
