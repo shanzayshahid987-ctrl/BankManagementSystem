@@ -4,12 +4,14 @@ import exceptions.*;
 import security.*;
 import java.util.Random;
 import java.util.ArrayList;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import transaction.Transaction;
 import transaction.TransactionType;
 import customer.*;
 
-public abstract class Account {
+public abstract class Account  implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String accountNumber;
     private AccountStatus status;
     private BigDecimal currentBalance;
@@ -52,6 +54,10 @@ public abstract class Account {
         return accNum;
     }
 
+    public boolean verifyPin(String inputPin) {
+    return this.pin.toVerify(inputPin);
+    }
+
     public String getAccountNumber() {
         return this.accountNumber;
     }
@@ -84,8 +90,14 @@ public abstract class Account {
         this.status = AccountStatus.ACTIVE;
     }
 
-    public void setTransactionPIN(String PIN) throws InvalidPinException {
-        this.pin = new TransactionPIN(PIN);
+    public void setTransactionPIN(String old, String PIN) throws InvalidPinException {
+        try{
+        if(this.pin.equals(old)){
+            this.pin= new TransactionPIN(PIN);
+        }
+    }catch(InvalidPinException e){
+        System.out.println("Invalid current PIN.");
+    }
     }
 
     public void setCurrentBalance(BigDecimal amount) {

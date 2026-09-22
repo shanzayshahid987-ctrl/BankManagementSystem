@@ -1,7 +1,9 @@
 package beneficiary;
 
+import java.io.Serializable;
 
-public class Beneficiary {
+public class Beneficiary  implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String beneficiaryName;
     private String nickname;
     private String accountNumber;

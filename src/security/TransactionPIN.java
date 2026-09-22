@@ -1,9 +1,12 @@
 package security;
 
 import exceptions.*;
+
+import java.io.Serializable;
 import java.security.*;
 
-public class TransactionPIN {
+public class TransactionPIN  implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String hashedPIN;
 
     public TransactionPIN(String rawPIN) throws InvalidPinException {

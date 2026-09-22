@@ -1,9 +1,11 @@
 package security;
 
+import java.io.Serializable;
 import java.security.*;
 import exceptions.InvalidPasswordFormatException;
 
-public class PasswordUtil {
+public class PasswordUtil  implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String hashedPass;
 
     public PasswordUtil(String rawPassword) throws InvalidPasswordFormatException {
@@ -29,7 +31,7 @@ public class PasswordUtil {
     }
 
     public boolean isValidFormat(String rawPassword) {
-        String pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?])[A-Za-z\\d!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]{8,12}$";
+        String pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?])[A-Za-z\\d!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]{8,20}$";
         return rawPassword.matches(pattern);
     }
 

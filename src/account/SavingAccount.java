@@ -1,5 +1,6 @@
 package account;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
@@ -8,13 +9,17 @@ import security.TransactionPIN;
 import transaction.*;
 import customer.*;
 import java.time.LocalDate;
+import java.math.RoundingMode;
 
 import customer.Customer;
 
-public class SavingAccount extends Account {
+public class SavingAccount extends Account implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private final BigDecimal yearlyInterestRate = BigDecimal.valueOf(0.05);
-    private final BigDecimal monthlyInterestRate = yearlyInterestRate.divide(BigDecimal.valueOf(12));
+
+    private final BigDecimal monthlyInterestRate = yearlyInterestRate.divide(BigDecimal.valueOf(12), 6,
+            RoundingMode.HALF_UP);
     private int transactionLimitCounter = 0;
     private int currentMonth = LocalDate.now().getMonthValue();
 
@@ -23,7 +28,7 @@ public class SavingAccount extends Account {
         super(custom, customers, PIN, balance);
     }
 
-    public void yearlyInterestRate() {
+    public void calculateYearlyInterest() {
         BigDecimal currentBalance = super.getCurrentBalance();
         BigDecimal interestAmount = currentBalance.multiply((this.yearlyInterestRate));
         super.setCurrentBalance(currentBalance.add(interestAmount));
@@ -32,8 +37,11 @@ public class SavingAccount extends Account {
         transactionHistory.add(t);
     }
 
-    public void monthlyInterestRate() {
+    public void calculateMonthlyInterest() throws AccountNotActiveException {
         BigDecimal currentBalance = super.getCurrentBalance();
+        if (this.getAccountStatus() != AccountStatus.ACTIVE) {
+            throw new AccountNotActiveException(this.getAccountNumber() + " is not active. Cannot credit interest.");
+        }
         BigDecimal interestAmount = currentBalance.multiply((this.monthlyInterestRate));
         super.setCurrentBalance(currentBalance.add(interestAmount));
         Transaction t = new Transaction(TransactionType.INTEREST, this,

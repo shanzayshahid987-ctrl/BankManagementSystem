@@ -3,9 +3,12 @@ package department;
 import admin.Admin;
 import exceptions.*;
 import security.PasswordUtil;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Department {
+public class Department  implements Serializable {
+    private static final long serialVersionUID = 1L;
     private PasswordUtil masterPassword; 
     private ArrayList<Admin> allAdmins;
 
@@ -26,5 +29,9 @@ public class Department {
     public ArrayList<Admin> getAllAdmins() {
         return this.allAdmins;
     }
+
+    public void setAllAdmins(ArrayList<Admin> admins) {
+    this.allAdmins = admins;
+}
 }
 

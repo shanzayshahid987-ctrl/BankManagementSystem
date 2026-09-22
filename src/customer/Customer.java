@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import account.Account;
 import security.PasswordUtil;
 import exceptions.*;
+
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import beneficiary.*;
 import java.time.format.DateTimeParseException;
 
-public class Customer {
+public class Customer  implements Serializable {
+    private static final long serialVersionUID = 1L;
     private ArrayList<Account> accounts;
     private String fullName;
     private String username;
@@ -68,6 +71,14 @@ public class Customer {
         return this.email;
     }
 
+    public String getHomeAddress(){
+        return this.homeAddress;
+    }
+
+    public String getContactNumber(){
+        return this.contactNumber;
+    }
+
     public String getUsername() {
         return this.username;
 
@@ -103,8 +114,22 @@ public class Customer {
         this.homeAddress = address;
     }
 
+    public void changePassword(String old, String newP) throws InvalidPasswordFormatException{
+        try{
+        if(this.password.equals(old)){
+            this.password = new PasswordUtil(newP);
+            System.out.println("Passeord updated sucessfully.");
+        } else{
+            System.out.println("Enter valid password.");
+        }
+        }catch(InvalidPasswordFormatException e){
+            throw new InvalidPasswordFormatException("Incorrect current Password.");
+        }
+        
+    }
+
     public boolean isValidFullName(String name) {
-        String pattern = "^[A-Za-z]{2,30}$";
+        String pattern = "^[A-Za-z ]{2,30}$";
         return name != null && name.matches(pattern);
     }
 
@@ -122,7 +147,7 @@ public class Customer {
     }
 
     public boolean isValidEmail(String email) {
-        String pattern = "^[A-Za-z0-9._%-+]+@[A-Za-z0-9._]+//.[A-Za-z]{2,6}$";
+        String pattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
         return email != null && email.matches(pattern);
     }
 

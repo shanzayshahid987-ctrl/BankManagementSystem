@@ -2,6 +2,7 @@ package admin;
 
 import java.util.ArrayList;
 import java.util.ArrayList;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import exceptions.*;
@@ -9,7 +10,8 @@ import security.PasswordUtil;
 import customer.*;
 import account.*;
 
-public class Admin {
+public class Admin implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String username;
     private PasswordUtil password;
 
@@ -19,7 +21,7 @@ public class Admin {
 
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return this.username;
     }
 
@@ -38,25 +40,24 @@ public class Admin {
         return null;
     }
 
-     public Customer findCustomerByCNIC(String accCNIC, ArrayList<Customer> allCustomer) {
+    public Customer findCustomerByCNIC(String accCNIC, ArrayList<Customer> allCustomer) {
         for (Customer c : allCustomer) {
-                if (c.getCNIC().equals(accCNIC)) {
-                    return c;
-                }
+            if (c.getCNIC().equals(accCNIC)) {
+                return c;
             }
+        }
         return null;
     }
-
 
     public void freezeAccount(String accNum, ArrayList<Customer> allCustomer)
             throws InvalidStatusChangeException {
         Account acc = findAccountByNum(accNum, allCustomer);
         if (acc != null) {
             if (acc.getAccountStatus() == AccountStatus.FROZEN) {
-                throw new InvalidStatusChangeException("\"Account \" + accNum +\" has already been freozen.");
+                throw new InvalidStatusChangeException("Account" + accNum + " has already been freozen.");
             }
             if (acc.getAccountStatus() == AccountStatus.CLOSED) {
-                throw new InvalidStatusChangeException("\"Account \" + accNum +\" has been closed.");
+                throw new InvalidStatusChangeException("Account " + accNum + " has been closed.");
             }
             acc.statusFrozen();
             System.out.println("Account " + accNum + " has been freozen.");
@@ -70,7 +71,7 @@ public class Admin {
         Account acc = findAccountByNum(accNum, allCustomer);
         if (acc != null) {
             if (acc.getAccountStatus() == AccountStatus.CLOSED) {
-                throw new InvalidStatusChangeException("\"Account \" + accNum +\" has been closed.");
+                throw new InvalidStatusChangeException("Account " + accNum + " has been closed.");
             }
             if (acc != null) {
                 acc.statusClosed();
@@ -87,10 +88,10 @@ public class Admin {
         Account acc = findAccountByNum(accNum, allCustomer);
         if (acc != null) {
             if (acc.getAccountStatus() == AccountStatus.ACTIVE) {
-                throw new InvalidStatusChangeException("\"Account \" + accNum +\" has already been active.");
+                throw new InvalidStatusChangeException("Account " + accNum + " has already been active.");
             }
             if (acc.getAccountStatus() == AccountStatus.CLOSED) {
-                throw new InvalidStatusChangeException("\"Account \" + accNum +\" has been closed.");
+                throw new InvalidStatusChangeException("Account " + accNum + " has been closed.");
             }
             acc.statusActive();
             System.out.println("Account " + accNum + " has been activated.");
@@ -99,25 +100,26 @@ public class Admin {
         }
     }
 
-    public BigDecimal getTotalBankBalance(ArrayList<Customer> allCustomers){
+    public BigDecimal getTotalBankBalance(ArrayList<Customer> allCustomers) {
         BigDecimal sum = BigDecimal.ZERO;
-        for(Customer c : allCustomers){
-            for(Account a : c.getAccounts()){
-                sum = sum.add(a.getCurrentBalance());
-
+        for (Customer c : allCustomers) {
+            for (Account a : c.getAccounts()) {
+                if (a.getAccountStatus() != AccountStatus.CLOSED) {
+                    sum = sum.add(a.getCurrentBalance());
+                }
             }
         }
         return sum;
     }
 
-    public void viewAllCustomers(ArrayList<Customer> allCustomers){
-        for(Customer c : allCustomers){
-            System.out.println("Customer: " + c.getFullName() +"| CNIC: " + c.getCNIC());
-            for(Account a : c.getAccounts()){
-             System.out.println("Account number:  " + a.getAccountNumber() +"| Current Balance: " + a.getCurrentBalance());
+    public void viewAllCustomers(ArrayList<Customer> allCustomers) {
+        for (Customer c : allCustomers) {
+            System.out.println("Customer: " + c.getFullName() + "| CNIC: " + c.getCNIC());
+            for (Account a : c.getAccounts()) {
+                System.out.println(
+                        "Account number:  " + a.getAccountNumber() + "| Current Balance: " + a.getCurrentBalance());
             }
         }
     }
 
 }
-

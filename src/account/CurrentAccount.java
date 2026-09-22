@@ -1,5 +1,6 @@
 package account;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
@@ -8,8 +9,8 @@ import exceptions.*;
 import transaction.Transaction;
 import transaction.TransactionType;
 
-public class CurrentAccount extends Account {
-
+public class CurrentAccount extends Account  implements Serializable{
+    private static final long serialVersionUID = 1L;
     private final BigDecimal accountLimit = BigDecimal.valueOf(10000);
 
     public CurrentAccount(Customer custom,ArrayList<Customer> customers, String PIN, BigDecimal balance)

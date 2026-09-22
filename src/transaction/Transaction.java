@@ -1,12 +1,15 @@
 package transaction;
 
 import account.*;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.ArrayList;
 
-public class Transaction {
+public class Transaction  implements Serializable {
+    private static final long serialVersionUID = 1L;
     private TransactionType type;
     private String transactionID;
     private Account account;
@@ -79,8 +82,8 @@ public class Transaction {
     public String generateBreifReceipt() {
         StringBuilder receipt = new StringBuilder();
         receipt.append("--------RECEIPT--------");
-        receipt.append("VaultEdge");
-        receipt.append("Transaction ID: ").append(this.transactionID).append("\n");
+        receipt.append("\n").append("VaultEdge");
+        receipt.append("\n").append("Transaction ID: ").append(this.transactionID).append("\n");
         receipt.append("Type: ").append(this.type).append("\n");
         receipt.append("Amount: ").append(this.amount).append("\n");
         receipt.append(this.dateTime.toLocalDate()).append(" ");
@@ -91,8 +94,8 @@ public class Transaction {
     public String generateDetailedReceipt() {
         StringBuilder receipt = new StringBuilder();
         receipt.append("--------RECEIPT--------");
-        receipt.append("VaultEdge");
-        receipt.append("Transaction ID: ").append(this.transactionID).append("\n");
+        receipt.append("\n").append("VaultEdge");
+        receipt.append("\n").append("Transaction ID: ").append(this.transactionID).append("\n");
         receipt.append("Type: ").append(this.type).append("\n");
         receipt.append("Amount: ").append(this.amount).append("\n");
         if (this.type == TransactionType.TRANSFER) {
