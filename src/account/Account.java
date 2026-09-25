@@ -9,7 +9,7 @@ import transaction.Transaction;
 import transaction.TransactionType;
 import customer.*;
 
-public abstract class Account  {
+public abstract class Account {
     private String accountNumber;
     private AccountStatus status;
     private BigDecimal currentBalance;
@@ -17,17 +17,18 @@ public abstract class Account  {
     protected ArrayList<Transaction> transactionHistory;
     private Customer customer;
     private ArrayList<Customer> customers;
+    private int dbId;
 
     protected Account(String accountNumber, AccountStatus status, BigDecimal balance,
-            String hashedPin, Customer customer, ArrayList<Customer> customers) 
-            throws InvalidPinException{
+            String hashedPin, Customer customer, ArrayList<Customer> customers)
+            throws InvalidPinException {
         this.customer = customer;
         this.customers = customers;
         this.transactionHistory = new ArrayList<>();
         this.accountNumber = accountNumber;
         this.status = status;
         this.currentBalance = balance;
-        this.pin = new TransactionPIN(hashedPin, true); 
+        this.pin = new TransactionPIN(hashedPin, true);
     }
 
     public Account(Customer customer, ArrayList<Customer> customers, String PIN, BigDecimal balance)
@@ -62,6 +63,14 @@ public abstract class Account  {
 
         } while (exist);
         return accNum;
+    }
+
+    public int getDbId() {
+        return this.dbId;
+    }
+
+    public void setDbId(int dbId) {
+        this.dbId = dbId;
     }
 
     public boolean verifyPin(String inputPin) {

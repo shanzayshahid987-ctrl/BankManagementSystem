@@ -21,7 +21,7 @@ public class BankManagementSystem {
 
         try {
             department = new Department("tracK9982^^");
-                department.setAllAdmins(new AdminDAO().findAll());
+            department.setAllAdmins(new AdminDAO().findAll());
 
         } catch (InvalidPasswordFormatException e) {
             System.out.println("Failed to initialize department: " + e.getMessage());
@@ -272,7 +272,8 @@ public class BankManagementSystem {
                 newAccount = new CurrentAccount(newCustomer, registeredCustomers, pin, balance);
             }
             newCustomer.addAccount(newAccount);
-            new AccountDAO().save(newAccount, newCustomer.getdbId());
+            int newAccountId = new AccountDAO().save(newAccount, newCustomer.getdbId());
+            newAccount.setDbId(newAccountId);
             System.out.println("Account created! Your account number: " + newAccount.getAccountNumber());
             return newAccount;
         } catch (InvalidPinException | MinimumBalanceException e) {
@@ -314,6 +315,8 @@ public class BankManagementSystem {
                         System.out.println("Deposit Sucessfull!");
                         ArrayList<Transaction> transactionList = activeAccount.getTransactionHistory();
                         Transaction latest = transactionList.get(transactionList.size() - 1);
+                        new TransactionDAO().save(latest, activeAccount.getDbId(), null);
+
                         System.out.println("View receipt as :" + "\n1-  Brief " + "\n2- Detailed");
                         int receipt;
                         try {
@@ -347,6 +350,8 @@ public class BankManagementSystem {
 
                         ArrayList<Transaction> transactionList = activeAccount.getTransactionHistory();
                         Transaction latest = transactionList.get(transactionList.size() - 1);
+                        new TransactionDAO().save(latest, activeAccount.getDbId(), null);
+
                         System.out.println("View receipt as :" + "\n1-  Brief " + "\n2- Detailed");
                         int receipt;
                         try {
@@ -401,6 +406,8 @@ public class BankManagementSystem {
                                 System.out.println("Transfer sucessfull!");
                                 ArrayList<Transaction> transactionList = currentAcc.getTransactionHistory();
                                 Transaction latest = transactionList.get(transactionList.size() - 1);
+                                new TransactionDAO().save(latest, currentAcc.getDbId(), givenAccount.getDbId());
+
                                 System.out.println("View receipt as :" + "\n1-  Brief " + "\n2- Detailed");
                                 int receipt;
                                 try {
@@ -494,7 +501,22 @@ public class BankManagementSystem {
                                     new AccountDAO().updateBalance(targetAccount.getAccountNumber(),
                                             targetAccount.getCurrentBalance());
                                     System.out.println("Transfer successful!");
-
+                                    ArrayList<Transaction> transactionList = currentAcc.getTransactionHistory();
+                                    Transaction latest = transactionList.get(transactionList.size() - 1);
+                                    new TransactionDAO().save(latest, currentAcc.getDbId(), targetAccount.getDbId());
+                                    System.out.println("View receipt as :" + "\n1-  Brief " + "\n2- Detailed");
+                                    int receipt;
+                                    try {
+                                        receipt = Integer.parseInt(scan.nextLine());
+                                    } catch (NumberFormatException e) {
+                                        System.out.println("Please enter a valid number.");
+                                        continue;
+                                    }
+                                    if (receipt == 1) {
+                                        System.out.println(latest.generateBreifReceipt());
+                                    } else {
+                                        System.out.println(latest.generateDetailedReceipt());
+                                    }
                                 } catch (AccountNotActiveException | InvalidAmountException | MinimumBalanceException
                                         | InsufficientBalanceException | TransactionLimitExceededException e) {
                                     System.out.println("Transfer failed: " + e.getMessage());
@@ -517,6 +539,7 @@ public class BankManagementSystem {
                 }
             }
         }
+
     }
 
     public static void accountSetting(Scanner scan, Account account, Customer custom) {
@@ -708,6 +731,8 @@ public class BankManagementSystem {
                         System.out.println("Monthly interest credited. New balance: " + acc.getCurrentBalance());
                         ArrayList<Transaction> transactionList = savAcc.getTransactionHistory();
                         Transaction latest = transactionList.get(transactionList.size() - 1);
+                        new TransactionDAO().save(latest, acc.getDbId(), null);
+
                         System.out.println("View receipt as :" + "\n1-  Brief " + "\n2- Detailed");
                         int receipt = Integer.parseInt(scan.nextLine());
                         if (receipt == 1) {
