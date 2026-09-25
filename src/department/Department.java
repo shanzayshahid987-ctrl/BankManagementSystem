@@ -4,11 +4,9 @@ import admin.Admin;
 import exceptions.*;
 import security.PasswordUtil;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Department  implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Department {
     private PasswordUtil masterPassword; 
     private ArrayList<Admin> allAdmins;
 

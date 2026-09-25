@@ -8,6 +8,7 @@ import customer.Customer;
 import exceptions.*;
 import transaction.*;
 import department.*;
+import dao.*;
 
 public class BankManagementSystem {
 
@@ -15,12 +16,13 @@ public class BankManagementSystem {
         Scanner scan = new Scanner(System.in);
         printLogo();
 
-        ArrayList<Customer> registeredCustomers = FileManager.loadCustomers();
+        ArrayList<Customer> registeredCustomers = new CustomerDAO().findAll();
         Department department = null;
 
         try {
             department = new Department("tracK9982^^");
-            department.setAllAdmins(FileManager.loadAdmins());
+                department.setAllAdmins(new AdminDAO().findAll());
+
         } catch (InvalidPasswordFormatException e) {
             System.out.println("Failed to initialize department: " + e.getMessage());
             return;
@@ -59,10 +61,6 @@ public class BankManagementSystem {
                 System.out.println("Invalid choice.");
             }
         }
-
-        FileManager.saveCustomers(registeredCustomers);
-        System.out.println("DEBUG: Saved " + registeredCustomers.size() + " customers.");
-        FileManager.saveAdmins(department.getAllAdmins());
 
     }
 
@@ -217,14 +215,17 @@ public class BankManagementSystem {
                 System.out.println("This username is already taken. Please choose another.");
                 System.out.print("Choose a username: ");
                 username = scan.nextLine();
-            } 
+            }
             System.out.print("Choose a password: ");
             String password = scan.nextLine();
 
             try {
                 newCustomer = new Customer(name, dob, password, email, cnic, contact, address, username);
+                int newId = new CustomerDAO().save(newCustomer);
+                newCustomer.setDbId(newId);
                 registeredCustomers.add(newCustomer);
                 System.out.println("Signup successful!");
+                signUpTry = true;
             } catch (InvalidNameException | InvalidDateException | InvalidPasswordFormatException
                     | InvalidEmailException | InvalidAgeException | InvalidCNICException
                     | InvalidContactNumberException e) {
@@ -271,6 +272,7 @@ public class BankManagementSystem {
                 newAccount = new CurrentAccount(newCustomer, registeredCustomers, pin, balance);
             }
             newCustomer.addAccount(newAccount);
+            new AccountDAO().save(newAccount, newCustomer.getdbId());
             System.out.println("Account created! Your account number: " + newAccount.getAccountNumber());
             return newAccount;
         } catch (InvalidPinException | MinimumBalanceException e) {
@@ -291,25 +293,35 @@ public class BankManagementSystem {
                     + "\n7- Transfer to Beneficiary" + "\n8- Account Setting"
                     + "\n9- Logout" + "\n");
             System.out.print("Choose option (1-9): ");
+
+            int option;
             try {
-                int option = Integer.parseInt(scan.nextLine());
+                option = Integer.parseInt(scan.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
                 continue;
             }
 
-            int option = Integer.parseInt(scan.nextLine());
             switch (option) {
                 case 1: {
                     System.out.println("Enter amount to deposit: ");
                     BigDecimal amountDep = new BigDecimal(scan.nextLine());
                     try {
                         activeAccount.deposit(amountDep);
+                        new AccountDAO().updateBalance(activeAccount.getAccountNumber(),
+                                activeAccount.getCurrentBalance());
+
                         System.out.println("Deposit Sucessfull!");
                         ArrayList<Transaction> transactionList = activeAccount.getTransactionHistory();
                         Transaction latest = transactionList.get(transactionList.size() - 1);
                         System.out.println("View receipt as :" + "\n1-  Brief " + "\n2- Detailed");
-                        int receipt = Integer.parseInt(scan.nextLine());
+                        int receipt;
+                        try {
+                            receipt = Integer.parseInt(scan.nextLine());
+                        } catch (NumberFormatException e) {
+                            System.out.println("Please enter a valid number.");
+                            continue;
+                        }
                         if (receipt == 1) {
                             System.out.println(latest.generateBreifReceipt());
                         } else {
@@ -329,11 +341,20 @@ public class BankManagementSystem {
                     }
                     try {
                         activeAccount.withdraw(amountWithdraw);
+                        new AccountDAO().updateBalance(activeAccount.getAccountNumber(),
+                                activeAccount.getCurrentBalance());
                         System.out.println("WithDrawal Sucessfull!");
+
                         ArrayList<Transaction> transactionList = activeAccount.getTransactionHistory();
                         Transaction latest = transactionList.get(transactionList.size() - 1);
                         System.out.println("View receipt as :" + "\n1-  Brief " + "\n2- Detailed");
-                        int receipt = Integer.parseInt(scan.nextLine());
+                        int receipt;
+                        try {
+                            receipt = Integer.parseInt(scan.nextLine());
+                        } catch (NumberFormatException e) {
+                            System.out.println("Please enter a valid number.");
+                            continue;
+                        }
                         if (receipt == 1) {
                             System.out.println(latest.generateBreifReceipt());
                         } else {
@@ -372,11 +393,22 @@ public class BankManagementSystem {
                             }
                             try {
                                 currentAcc.transfer(givenAccount, amount);
+                                new AccountDAO().updateBalance(currentAcc.getAccountNumber(),
+                                        currentAcc.getCurrentBalance());
+                                new AccountDAO().updateBalance(givenAccount.getAccountNumber(),
+                                        givenAccount.getCurrentBalance());
+
                                 System.out.println("Transfer sucessfull!");
                                 ArrayList<Transaction> transactionList = currentAcc.getTransactionHistory();
                                 Transaction latest = transactionList.get(transactionList.size() - 1);
                                 System.out.println("View receipt as :" + "\n1-  Brief " + "\n2- Detailed");
-                                int receipt = Integer.parseInt(scan.nextLine());
+                                int receipt;
+                                try {
+                                    receipt = Integer.parseInt(scan.nextLine());
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Please enter a valid number.");
+                                    continue;
+                                }
                                 if (receipt == 1) {
                                     System.out.println(latest.generateBreifReceipt());
                                 } else {
@@ -415,6 +447,8 @@ public class BankManagementSystem {
 
                     Beneficiary newBen = new Beneficiary(benName, benAccNum, nickname);
                     customer.addBeneficiary(newBen);
+                    new BeneficiaryDAO().save(newBen, customer.getdbId());
+
                     System.out.println("Beneficiary added successfully!");
                     break;
                 }
@@ -455,7 +489,12 @@ public class BankManagementSystem {
                                 }
                                 try {
                                     currentAcc.transfer(targetAccount, amount);
+                                    new AccountDAO().updateBalance(currentAcc.getAccountNumber(),
+                                            currentAcc.getCurrentBalance());
+                                    new AccountDAO().updateBalance(targetAccount.getAccountNumber(),
+                                            targetAccount.getCurrentBalance());
                                     System.out.println("Transfer successful!");
+
                                 } catch (AccountNotActiveException | InvalidAmountException | MinimumBalanceException
                                         | InsufficientBalanceException | TransactionLimitExceededException e) {
                                     System.out.println("Transfer failed: " + e.getMessage());
@@ -502,6 +541,8 @@ public class BankManagementSystem {
                     String passKey2 = scan.nextLine();
                     try {
                         custom.changePassword(passKey1, passKey2);
+                        new CustomerDAO().updatePassword(custom.getdbId(), custom.getHashedPassword());
+
                     } catch (InvalidPasswordFormatException e) {
                         System.out.println("Update fsiled: " + e.getMessage());
                     }
@@ -514,6 +555,7 @@ public class BankManagementSystem {
                     String pin2 = scan.nextLine();
                     try {
                         account.setTransactionPIN(pin1, pin2);
+                        new AccountDAO().updatePin(account.getAccountNumber(), account.getHashedPin());
                         System.out.println("PIN updated sucessfully.");
                     } catch (InvalidPinException e) {
                         System.out.println("Update failed: " + e.getMessage());
@@ -527,6 +569,8 @@ public class BankManagementSystem {
                     String number = scan.nextLine();
                     try {
                         custom.setContactNumber(number);
+                        new CustomerDAO().updateContact(custom.getdbId(), custom.getContactNumber());
+
                         System.out.println("Contact Number updated sucessfully.");
                     } catch (InvalidContactNumberException e) {
                         System.out.println("UPdate failed: " + e.getMessage());
@@ -540,6 +584,8 @@ public class BankManagementSystem {
                     System.out.println("Enter new Home Address: ");
                     String address = scan.nextLine();
                     custom.setHomeAddress(address);
+                    new CustomerDAO().updateAddress(custom.getdbId(), custom.getHomeAddress());
+
                     System.out.println("Address updated sucessfully.");
 
                     break;
@@ -606,6 +652,9 @@ public class BankManagementSystem {
                     String accNum = scan.nextLine();
                     try {
                         admin.freezeAccount(accNum, registeredCustomers);
+                        Account acc = admin.findAccountByNum(accNum, registeredCustomers);
+                        new AccountDAO().updateStatus(accNum, acc.getAccountStatus());
+
                     } catch (InvalidStatusChangeException e) {
                         System.out.println("Account Freezing failed: " + e.getMessage());
                     }
@@ -616,6 +665,8 @@ public class BankManagementSystem {
                     String accNum = scan.nextLine();
                     try {
                         admin.closeAccount(accNum, registeredCustomers);
+                        Account acc = admin.findAccountByNum(accNum, registeredCustomers);
+                        new AccountDAO().updateStatus(accNum, acc.getAccountStatus());
                     } catch (InvalidStatusChangeException e) {
                         System.out.println("Account closing failed: " + e.getMessage());
 
@@ -627,6 +678,8 @@ public class BankManagementSystem {
                     String accNum = scan.nextLine();
                     try {
                         admin.reactiveAccount(accNum, registeredCustomers);
+                        Account acc = admin.findAccountByNum(accNum, registeredCustomers);
+                        new AccountDAO().updateStatus(accNum, acc.getAccountStatus());
                     } catch (InvalidStatusChangeException e) {
                         System.out.println("Reactivation failed: " + e.getMessage());
 
@@ -648,6 +701,7 @@ public class BankManagementSystem {
                         SavingAccount savAcc = (SavingAccount) acc;
                         try {
                             savAcc.calculateMonthlyInterest();
+                            new AccountDAO().updateBalance(savAcc.getAccountNumber(), savAcc.getCurrentBalance());
                         } catch (AccountNotActiveException e) {
                             System.out.println(e.getMessage());
                         }
@@ -693,6 +747,9 @@ public class BankManagementSystem {
 
                     try {
                         department.registerAdmin(newAdminUser, newAdminPass);
+                        Admin newAdmin = department.getAllAdmins().get(department.getAllAdmins().size() - 1);
+                        new AdminDAO().save(newAdmin);
+
                         System.out.println("Admin registered successfully!");
                         registerAdmin = false;
                         departTry = false;

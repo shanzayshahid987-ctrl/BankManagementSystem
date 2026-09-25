@@ -4,14 +4,12 @@ import exceptions.*;
 import security.*;
 import java.util.Random;
 import java.util.ArrayList;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import transaction.Transaction;
 import transaction.TransactionType;
 import customer.*;
 
-public abstract class Account  implements Serializable {
-    private static final long serialVersionUID = 1L;
+public abstract class Account  {
     private String accountNumber;
     private AccountStatus status;
     private BigDecimal currentBalance;
@@ -19,6 +17,18 @@ public abstract class Account  implements Serializable {
     protected ArrayList<Transaction> transactionHistory;
     private Customer customer;
     private ArrayList<Customer> customers;
+
+    protected Account(String accountNumber, AccountStatus status, BigDecimal balance,
+            String hashedPin, Customer customer, ArrayList<Customer> customers) 
+            throws InvalidPinException{
+        this.customer = customer;
+        this.customers = customers;
+        this.transactionHistory = new ArrayList<>();
+        this.accountNumber = accountNumber;
+        this.status = status;
+        this.currentBalance = balance;
+        this.pin = new TransactionPIN(hashedPin, true); 
+    }
 
     public Account(Customer customer, ArrayList<Customer> customers, String PIN, BigDecimal balance)
             throws InvalidPinException {
@@ -55,7 +65,7 @@ public abstract class Account  implements Serializable {
     }
 
     public boolean verifyPin(String inputPin) {
-    return this.pin.toVerify(inputPin);
+        return this.pin.toVerify(inputPin);
     }
 
     public String getAccountNumber() {
@@ -70,11 +80,15 @@ public abstract class Account  implements Serializable {
         return this.currentBalance;
     }
 
+    public String getHashedPin() {
+        return this.pin.getHashedPin();
+    }
+
     public Customer getCustomer() {
         return this.customer;
     }
 
-    public ArrayList<Transaction> getTransactionHistory(){
+    public ArrayList<Transaction> getTransactionHistory() {
         return this.transactionHistory;
     }
 
@@ -91,13 +105,13 @@ public abstract class Account  implements Serializable {
     }
 
     public void setTransactionPIN(String old, String PIN) throws InvalidPinException {
-        try{
-        if(this.pin.equals(old)){
-            this.pin= new TransactionPIN(PIN);
+        try {
+            if (this.pin.equals(old)) {
+                this.pin = new TransactionPIN(PIN);
+            }
+        } catch (InvalidPinException e) {
+            System.out.println("Invalid current PIN.");
         }
-    }catch(InvalidPinException e){
-        System.out.println("Invalid current PIN.");
-    }
     }
 
     public void setCurrentBalance(BigDecimal amount) {

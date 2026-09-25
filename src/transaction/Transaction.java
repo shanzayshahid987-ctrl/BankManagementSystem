@@ -1,15 +1,12 @@
 package transaction;
 
 import account.*;
-
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.ArrayList;
 
-public class Transaction  implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Transaction {
     private TransactionType type;
     private String transactionID;
     private Account account;

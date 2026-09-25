@@ -5,14 +5,12 @@ import account.Account;
 import security.PasswordUtil;
 import exceptions.*;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import beneficiary.*;
 import java.time.format.DateTimeParseException;
 
-public class Customer  implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Customer  {
     private ArrayList<Account> accounts;
     private String fullName;
     private String username;
@@ -24,6 +22,23 @@ public class Customer  implements Serializable {
     private String contactNumber;
     private String homeAddress;
     private ArrayList<Beneficiary> totalBeneficiary;
+    private int dbId;
+
+    public Customer(int dbId, String fullName, String dob, String email, String cnic,
+            String contactNumber, String homeAddress, String username, String hashedPassword)
+            throws InvalidPasswordFormatException {
+        this.accounts = new ArrayList<>();
+        this.dbId = dbId;
+        this.totalBeneficiary = new ArrayList<>();
+        this.fullName = fullName;
+        this.dob = dob;
+        this.email = email;
+        this.cnicNumber = cnic;
+        this.contactNumber = contactNumber;
+        this.homeAddress = homeAddress;
+        this.username = username;
+        this.password = new PasswordUtil(hashedPassword, true);
+    }
 
     public Customer(String name, String dob, String password, String email, String cnic,
             String number, String address, String username) throws InvalidNameException, InvalidDateException,
@@ -41,12 +56,12 @@ public class Customer  implements Serializable {
             throw new InvalidDateException("Invalid date.");
         }
         this.dob = dob;
-        
-         try {
-        this.password = new PasswordUtil(password);
-    } catch (InvalidPasswordFormatException e) {
-        throw new InvalidPasswordFormatException(e.getMessage());
-    }
+
+        try {
+            this.password = new PasswordUtil(password);
+        } catch (InvalidPasswordFormatException e) {
+            throw new InvalidPasswordFormatException(e.getMessage());
+        }
         if (!(this.isValidEmail(email))) {
             throw new InvalidEmailException("Invalid Email entered.");
         }
@@ -67,15 +82,15 @@ public class Customer  implements Serializable {
 
     }
 
-    public String getEmail(){
+    public String getEmail() {
         return this.email;
     }
 
-    public String getHomeAddress(){
+    public String getHomeAddress() {
         return this.homeAddress;
     }
 
-    public String getContactNumber(){
+    public String getContactNumber() {
         return this.contactNumber;
     }
 
@@ -92,8 +107,24 @@ public class Customer  implements Serializable {
         return this.cnicNumber;
     }
 
+    public String getDob() {
+        return this.dob;
+    }
+
+    public String getHashedPassword() {
+        return this.password.toString();
+    }
+
     public ArrayList<Account> getAccounts() {
         return this.accounts;
+    }
+
+    public int getdbId() {
+        return this.dbId;
+    }
+
+    public void setDbId(int dbId) {
+        this.dbId = dbId;
     }
 
     public void setContactNumber(String number) throws InvalidContactNumberException {
@@ -114,18 +145,18 @@ public class Customer  implements Serializable {
         this.homeAddress = address;
     }
 
-    public void changePassword(String old, String newP) throws InvalidPasswordFormatException{
-        try{
-        if(this.password.equals(old)){
-            this.password = new PasswordUtil(newP);
-            System.out.println("Passeord updated sucessfully.");
-        } else{
-            System.out.println("Enter valid password.");
-        }
-        }catch(InvalidPasswordFormatException e){
+    public void changePassword(String old, String newP) throws InvalidPasswordFormatException {
+        try {
+            if (this.password.toVerify(old)) {
+                this.password = new PasswordUtil(newP);
+                System.out.println("Passeord updated sucessfully.");
+            } else {
+                System.out.println("Enter valid password.");
+            }
+        } catch (InvalidPasswordFormatException e) {
             throw new InvalidPasswordFormatException("Incorrect current Password.");
         }
-        
+
     }
 
     public boolean isValidFullName(String name) {
@@ -138,12 +169,12 @@ public class Customer  implements Serializable {
             return false;
         }
         try {
-        LocalDate birthDate = LocalDate.parse(dob);
-        LocalDate currentDate = LocalDate.now();
-        return !birthDate.isAfter(currentDate);
-    } catch (DateTimeParseException e) {
-        return false;
-    }
+            LocalDate birthDate = LocalDate.parse(dob);
+            LocalDate currentDate = LocalDate.now();
+            return !birthDate.isAfter(currentDate);
+        } catch (DateTimeParseException e) {
+            return false;
+        }
     }
 
     public boolean isValidEmail(String email) {
@@ -205,11 +236,11 @@ public class Customer  implements Serializable {
         return null;
     }
 
-    public void addBeneficiary(Beneficiary bene){
+    public void addBeneficiary(Beneficiary bene) {
         this.totalBeneficiary.add(bene);
     }
 
-    public ArrayList<Beneficiary> getBeneficiaries(){
+    public ArrayList<Beneficiary> getBeneficiaries() {
         return this.totalBeneficiary;
     }
 }

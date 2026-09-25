@@ -1,15 +1,26 @@
 package security;
 
-import java.io.Serializable;
 import java.security.*;
 import exceptions.InvalidPasswordFormatException;
 
-public class PasswordUtil  implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class PasswordUtil {
     private String hashedPass;
 
+    public PasswordUtil(String value, boolean isAlreadyHashed)
+    throws InvalidPasswordFormatException {
+        if (isAlreadyHashed) {
+            this.hashedPass = value; 
+        } else {
+             if (!(this.isValidFormat(value))) {
+            throw new InvalidPasswordFormatException(
+                    "Password must be 8 characters, including number and special character");
+        }
+        this.hashedPass = hash(value);
+        }
+    }
+
     public PasswordUtil(String rawPassword) throws InvalidPasswordFormatException {
-        if (!(this.isValidFormat(rawPassword))) {
+       ; if (!(this.isValidFormat(rawPassword))) {
             throw new InvalidPasswordFormatException(
                     "Password must be 8 characters, including number and special character");
         }

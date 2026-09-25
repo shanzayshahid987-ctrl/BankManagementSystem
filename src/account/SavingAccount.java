@@ -13,9 +13,8 @@ import java.math.RoundingMode;
 
 import customer.Customer;
 
-public class SavingAccount extends Account implements Serializable {
+public class SavingAccount extends Account {
 
-    private static final long serialVersionUID = 1L;
     private final BigDecimal yearlyInterestRate = BigDecimal.valueOf(0.05);
 
     private final BigDecimal monthlyInterestRate = yearlyInterestRate.divide(BigDecimal.valueOf(12), 6,
@@ -23,9 +22,24 @@ public class SavingAccount extends Account implements Serializable {
     private int transactionLimitCounter = 0;
     private int currentMonth = LocalDate.now().getMonthValue();
 
+    public SavingAccount(String accountNumber, AccountStatus status, BigDecimal balance,
+            String hashedPin, Customer customer, ArrayList<Customer> customers, int withdrawalCount)
+            throws InvalidPinException {
+        super(accountNumber, status, balance, hashedPin, customer, customers);
+        this.transactionLimitCounter = withdrawalCount;
+    }
+
     public SavingAccount(Customer custom, ArrayList<Customer> customers, String PIN, BigDecimal balance)
             throws InvalidPinException {
         super(custom, customers, PIN, balance);
+    }
+
+    public int getTransactionLimitCounter() {
+        return this.transactionLimitCounter;
+    }
+
+    public BigDecimal getYearlyInterestRate() {
+        return this.yearlyInterestRate;
     }
 
     public void calculateYearlyInterest() {

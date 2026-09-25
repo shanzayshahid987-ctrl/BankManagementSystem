@@ -2,7 +2,6 @@ package admin;
 
 import java.util.ArrayList;
 import java.util.ArrayList;
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 import exceptions.*;
@@ -10,10 +9,15 @@ import security.PasswordUtil;
 import customer.*;
 import account.*;
 
-public class Admin implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Admin  {
     private String username;
     private PasswordUtil password;
+
+    public Admin(String username, String hashedPassword, boolean fromDatabase) throws
+    InvalidPasswordFormatException {
+    this.username = username;
+    this.password = new PasswordUtil(hashedPassword, true);
+}
 
     public Admin(String username, String passKey) throws InvalidPasswordFormatException {
         this.username = username;
@@ -23,6 +27,10 @@ public class Admin implements Serializable {
 
     public String getUsername() {
         return this.username;
+    }
+
+    public String getHashedPassword(){
+       return  this.password.toString();
     }
 
     public boolean login(String password) {
